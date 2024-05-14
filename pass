@@ -1,0 +1,54 @@
+#!/bin/sh
+
+KEY="${HOME}/.passes/meta/identities"
+PASSDIR="${HOME}/.passes"
+
+prompt() {
+	stty -echo
+	printf "Enter a password: "
+	read first
+	printf '\n'
+	printf "Re-enter the password: "
+	read second
+	printf '\n'
+	stty echo
+	if [ "$first" != "$second" ]; then
+		echo "Passwords do not match." 1>&2
+		return 1
+	fi
+	ENTERED="$first"
+	return 0
+}
+
+add() {
+	prompt 
+	if [ $? != 0 ]; then
+		exit 1
+	fi
+	mkdir -p "${PASSDIR}/$(dirname $1)"
+	echo $ENTERED | age -R "${PASSDIR}/meta/recipients" -i "$KEY" -e -o "${PASSDIR}/passwords/$1"
+}
+
+add_noprompt() {
+	ENTERED=$(cat)
+	mkdir -p "${PASSDIR}/$(dirname $1)"
+	echo $ENTERED | age -R "${PASSDIR}/meta/recipients" -i "$KEY" -e -o "${PASSDIR}/passwords/$1"
+}
+
+get() {
+	age -i "$KEY" -d "${PASSDIR}/passwords/$1"
+}
+
+case "$1"
+in
+	add)
+		if [ "$2" = "-m" ]; then
+			add_noprompt $3
+			exit 0
+		fi
+		add $2;;
+	get)
+		get $2;;
+	"")     echo "usage: pass [cmd] <password>";;
+	*) get $1;;
+esac
