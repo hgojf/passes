@@ -21,7 +21,27 @@ prompt() {
 }
 
 add() {
-	prompt 
+	while getopts m name
+	do
+		case $name in
+		m) noprompt=0 ;;
+		?)
+			echo "usage: pass add [-m] <password>"; exit 2 ;;
+		esac
+	done
+	shift $(($OPTIND - 1))
+
+	if [ $# -ne 1 ]; then
+		echo "usage: pass add [-m] <password>"
+		exit 2
+	fi
+
+	if [ -z $noprompt ]; then
+		prompt 
+	else
+		ENTERED=$(cat)
+	fi
+
 	if [ $? != 0 ]; then
 		exit 1
 	fi
@@ -29,26 +49,26 @@ add() {
 	echo $ENTERED | age -R "${PASSDIR}/meta/recipients" -i "$KEY" -e -o "${PASSDIR}/passwords/$1"
 }
 
-add_noprompt() {
-	ENTERED=$(cat)
-	mkdir -p "${PASSDIR}/$(dirname $1)"
-	echo $ENTERED | age -R "${PASSDIR}/meta/recipients" -i "$KEY" -e -o "${PASSDIR}/passwords/$1"
-}
-
 get() {
+	if [ $# -ne 1 ]; then
+		echo "usage: pass get <password>"
+		exit 2
+	fi
+	if [ ! -f "${PASSDIR}/passwords/$1" ]; then
+		echo "No such password found" 2>&1
+		exit 1
+	fi
 	age -i "$KEY" -d "${PASSDIR}/passwords/$1"
 }
 
 case "$1"
 in
 	add)
-		if [ "$2" = "-m" ]; then
-			add_noprompt $3
-			exit 0
-		fi
-		add $2;;
+		shift 1
+		add $@ ;;
 	get)
-		get $2;;
-	"")     echo "usage: pass [cmd] <password>";;
-	*) get $1;;
+		shift 1
+		get $@;;
+	"")     echo "usage: pass [command] <password>";;
+	*) get $@ ;;
 esac
