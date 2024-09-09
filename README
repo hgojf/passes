@@ -1,0 +1,3 @@
+Small pass clone written in POSIX sh using age for encryption.
+
+Depends on 'age': https://github.com/FiloSottile/age
