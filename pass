@@ -155,8 +155,9 @@ if [ $# -eq 0 ]; then
 fi
 
 case $1 in
-add) shift 1; add $@ ;;
-get) shift 1; get $@ ;;
-init) shift 1; init $@ ;;
-*) get1 $@; ;;
+add|get|init)
+	cmd=$1
+	shift 1
+	$cmd "$@" ;;
+*) get1 "$@"; ;;
 esac
