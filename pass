@@ -57,7 +57,7 @@ add() {
 	mkdir -p "${PASSDIR}/passwords/$(dirname "$1")" || exit 1
 
 	echo "${ENTERED}" | age -R "${PUBKEY}" -i "${PRIVKEY}" -e -o \
-		"${PASSDIR}/passwords/$1"
+		"${PASSDIR}/passwords/$1" || exit 1
 }
 
 get_usage() {
@@ -84,7 +84,7 @@ get() {
 		exit 1
 	fi
 
-	age -i "${PRIVKEY}" -d "${PASSDIR}/passwords/$1"
+	age -i "${PRIVKEY}" -d "${PASSDIR}/passwords/$1" || exit 1
 }
 
 get1() {
@@ -123,7 +123,7 @@ init() {
 	mkdir -m 0700 "${PASSDIR}" || exit 1
 	mkdir -m 0700 "${METADIR}" || exit 1
 
-	key="$(age-keygen 2>/dev/null)"
+	key="$(age-keygen 2>/dev/null)" || exit 1
 	echo "${key}" | age -p > "${PRIVKEY}" || exit 1
 	echo "${key}" | age-keygen -y > "${PUBKEY}" || exit 1
 }
