@@ -137,7 +137,10 @@ prompt() {
 }
 
 usage() {
-	echo "usage: pass cmd [arg ...]" 1>&2
+	echo "usage: pass password" 1>&2
+	echo "       pass add [-m] password" 1>&2
+	echo "       pass get password" 1>&2
+	echo "       pass init" 1>&2
 }
 
 while getopts "" name
