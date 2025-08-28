@@ -1,0 +1,2 @@
+#!/bin/sh
+passes get $1 | oathtool -b --totp -

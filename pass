@@ -61,15 +61,13 @@ add() {
 }
 
 get_usage() {
-	echo "usage: pass get [-o] password" 1>&2
+	echo "usage: pass get password" 1>&2
 }
 
 get() {
-	otp=0
-	while getopts "o" name
+	while getopts "" name
 	do
 		case $name in
-		o) otp=1 ;;
 		?) get_usage ; exit 2 ;;
 		esac
 	done
@@ -86,11 +84,7 @@ get() {
 		exit 1
 	fi
 
-	if [ $otp -eq 1 ]; then
-		age -i "${PRIVKEY}" -d "${PASSDIR}/passwords/$1" | oathtool -b --totp - || exit 1
-	else
-		age -i "${PRIVKEY}" -d "${PASSDIR}/passwords/$1" || exit 1
-	fi
+	age -i "${PRIVKEY}" -d "${PASSDIR}/passwords/$1" || exit 1
 }
 
 get1() {
@@ -113,7 +107,6 @@ init() {
 		?) init_usage; exit 2 ;;
 		esac
 	done
-
 	shift $(($OPTIND - 1))
 
 	if [ $# -ne 0 ]; then
