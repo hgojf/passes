@@ -1,2 +1,8 @@
 #!/bin/sh
+
+if [ $# -ne 1 ]; then
+	echo "usage: pass-otp password" 1>&2
+	exit 2
+fi
+
 passes get $1 | oathtool -b --totp -
